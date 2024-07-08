@@ -1,19 +1,31 @@
 package SeleniumIntro.SeleniumIntro;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Window;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.Select;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
 
-public class BrowserLaunch {
+public class FBDataDriven {
 
-	public static void main(String[] args) throws InterruptedException
+	
+	@Test(dataProvider ="datapro2")
+	public  static void createAccount(String s1, String s2) throws InterruptedException
 	{
-			
+	  
+	 
       WebDriverManager.chromedriver().setup();
       ChromeDriver driver=new ChromeDriver();
       driver.get("https://www.facebook.com/");
@@ -33,10 +45,10 @@ public class BrowserLaunch {
       Thread.sleep(1000);
       
       WebElement fname=driver.findElement(By.name("firstname"));
-      fname.sendKeys("test");
+      fname.sendKeys(s1);
       Thread.sleep(1000);
       WebElement sname=driver.findElement(By.name("lastname"));
-      sname.sendKeys("account");
+      sname.sendKeys(s2);
       
       WebElement emaill=driver.findElement(By.name("reg_email__"));
       emaill.sendKeys("testing@gmail.com");
@@ -52,8 +64,7 @@ public class BrowserLaunch {
       
       WebElement day=driver.findElement(By.name("birthday_day")); //locate the element
       Select daySelect = new Select(day); //Select class and pass the webelement 
-      String day1="9";
-      daySelect.selectByVisibleText(day1);
+      daySelect.selectByVisibleText("9");
       
       WebElement month=driver.findElement(By.name("birthday_month"));
       Select monthSelect=new Select(month);
@@ -75,11 +86,47 @@ public class BrowserLaunch {
       
       
       
-     
-      
-     
+     driver.close();
+      		
+	}
+	
+	@DataProvider
+	public Object[][] datapro1()
+	{
+		Object[][] ob=new Object[3][2];
+		ob[0][0]="user1";
+		ob[0][1]="lastname1";
+		ob[1][0]="user2";
+		ob[1][1]="lastname2";
+		ob[2][0]="user3";
+		ob[2][1]="lastname3";
 		
+		return ob;
 		
+	}
+	
+	@DataProvider
+	public Object[][] datapro2() throws BiffException, IOException
+	{
+		File f=new File("C:\\Users\\dipsa\\Desktop\\KeywordDrivenData.xls");	
+		Workbook wk=Workbook.getWorkbook(f);
+		Sheet ws=wk.getSheet(1);
+		
+		//number of rows 
+		int r=ws.getRows();
+		int c=ws.getColumns();
+		Object[][] ob=new Object[r][c];
+		
+		for(int i=0;i<r;i++)
+		{
+			for(int j=0;j<c;j++)
+			{
+				Cell wc=ws.getCell(j,i);
+				ob[i][j]=wc.getContents();
+			}
+		}
+		
+		return ob;				
 	}
 
 }
